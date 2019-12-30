@@ -44,6 +44,8 @@
             cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
             console.log(util.showType(dst));
             cv.imshow(canvas, dst);
+
+            //Don't forget to delete cv.Mat if you don't want to use them any more
             src.delete();
             dst.delete();
           };
