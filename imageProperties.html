@@ -8,12 +8,14 @@
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
+    <div id="properties"><h1>Image Properties</h1></div>
     <script src="lib/opencv.js"></script>
+    <script src="lib/opencvUtil.js"></script>
     <script>
       window.onload = function() {
         const canvas = document.getElementById("myCanvas");
-        canvas.width = screen.width;
-        canvas.height = screen.height;
+        canvas.width = 400;
+        canvas.height = 400;
         const ctx = canvas.getContext("2d");
 
         const image = new Image();
@@ -22,15 +24,30 @@
           ctx.drawImage(image, 0, 0);
         });
 
-        document.body.onclick = function() {
-          let src = cv.imread(canvas);
-          let dst = new cv.Mat();
-          // You can try more different parameters
-          cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
-          cv.imshow(canvas, dst);
-          src.delete();
-          dst.delete();
-        };
+        openCvReady();
+
+        function openCvReady() {
+          cv["onRuntimeInitialized"] = () => {
+              const util = new opencvUtil();
+            let src = cv.imread(canvas);
+
+            let properties = document.createElement("ul");
+            properties.innerHTML = 
+            `<li>image width: ${src.cols}</li>`+
+            `<li>image height: ${src.rows}</li>`+
+            `<li>data channel: ${src.channels()}</li>`+
+            `<li>data type: ${util.showType(src)}</li>`;
+            document.getElementById("properties").appendChild(properties);
+
+            let dst = new cv.Mat();
+            // You can try more different parameters
+            cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+            console.log(util.showType(dst));
+            cv.imshow(canvas, dst);
+            src.delete();
+            dst.delete();
+          };
+        }
       };
     </script>
   </body>
