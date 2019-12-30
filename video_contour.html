@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <title>filter.js sample</title>
+  </head>
+  <body>
+    <video id="webcam" autoplay muted playsinline></video>
+    <canvas id="canvas"></canvas>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="lib/opencv.js"></script>
+    <script>
+      window.onload = function() {
+        openCvReady();
+
+        function openCvReady() {
+          cv["onRuntimeInitialized"] = () => {
+            let video = document.getElementById("webcam");
+            let canvas = document.getElementById("canvas");
+            let ctx = canvas.getContext("2d");
+            canvas.width = screen.width;
+            canvas.height = screen.height;
+            video.width=canvas.width;
+            video.height=canvas.height;
+
+            // このメソッドを呼び出すことでユーザーにブラウザがカメラを使用することを許可するかの確認ダイアログが表示され、
+            // 許可されれば handleSuccess が呼ばれる
+            navigator.mediaDevices
+              .getUserMedia({
+                video: {
+                  facingMode: "environment",
+                //   facingMode: "user",
+                  width: screen.height,
+                  height: screen.width
+                },
+                audio: false
+              })
+              .then(function(mediaStream) {
+                video.srcObject = mediaStream;
+                openCVVideo();
+
+                var event = new CustomEvent("camera-init", { stream: stream });
+                window.dispatchEvent(event);
+
+                document.body.addEventListener("click", function() {
+                  video.play();
+                });
+
+                var interval = setInterval(function() {
+                  if (!video.videoWidth) return;
+                  onReady();
+                  clearInterval(interval);
+                }, 1000 / 50);
+              })
+              .catch(err => {
+                console.log(JSON.stringify(err));
+              });
+
+            function openCVVideo() {
+              const FPS = 30;
+              let cap = new cv.VideoCapture(video);
+              
+              function processVideo() {
+                let begin = Date.now();
+                let src = new cv.Mat(video.height,video.width,cv.CV_8UC4);
+                let dst = new cv.Mat.zeros(video.height, video.width, cv.CV_8UC3);
+
+                cap.read(src);
+                cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
+                cv.threshold(src, src, 100, 200, cv.THRESH_BINARY);
+                let contours = new cv.MatVector();
+                let hierarchy = new cv.Mat();
+                let poly = new cv.MatVector();
+                cv.findContours(
+                  src,
+                  contours,
+                  hierarchy,
+                  cv.RETR_CCOMP,
+                  cv.CHAIN_APPROX_SIMPLE
+                );
+                // approximates each contour to polygon
+                for (let i = 0; i < contours.size(); ++i) {
+                  let tmp = new cv.Mat();
+                  let cnt = contours.get(i);
+                  // You can try more different parameters
+                  cv.approxPolyDP(cnt, tmp, 3, true);
+                  poly.push_back(tmp);
+                  cnt.delete();
+                  tmp.delete();
+                }
+                // draw contours with random Scalar
+                for (let i = 0; i < contours.size(); ++i) {
+                  let color = new cv.Scalar(
+                    Math.round(Math.random() * 255),
+                    Math.round(Math.random() * 255),
+                    Math.round(Math.random() * 255)
+                  );
+                  cv.drawContours(dst, poly, i, color, 1, 8, hierarchy, 0);
+                }
+                cv.imshow(canvas, dst);
+                src.delete();
+                dst.delete();
+                hierarchy.delete();
+                contours.delete();
+                poly.delete();
+
+                let delay = 1000 / FPS - (Date.now() - begin);
+                setTimeout(processVideo, delay);
+              }
+              setTimeout(processVideo, 0);
+            }
+          };
+        }
+      };
+    </script>
+  </body>
+</html>
