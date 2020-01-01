@@ -4,10 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Blur Image</title>
+    <title>Detect</title>
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
+    <p>ポインタ(ptr)を使ってピクセルにアクセス、操作をする。<a href="https://docs.opencv.org/3.3.1/de/d06/tutorial_js_basic_ops.html">参考資料</a></p>
     <script src="/lib/opencv.js"></script>
     <script src="/lib/opencvUtil.js"></script>
     <script>
@@ -28,16 +29,12 @@
         function openCvReady() {
           cv["onRuntimeInitialized"] = () => {
             let src = cv.imread(canvas);
-            let dst = new cv.Mat();
-            let ksize = new cv.Size(30,30);
-            let anchor = new cv.Point(-1, -1);
 
-            cv.blur(src, dst, ksize, anchor, cv.BORDER_DEFAULT);
-            cv.imshow(canvas, dst);
+            cv.
+            cv.imshow(canvas, src);
 
-            //Don't forget to delete cv.Mat if you don't want to use them any more
+            //delete unnecessary Mat 
             src.delete();
-            dst.delete();
           };
         }
       };

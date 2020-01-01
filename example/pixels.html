@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Image Properties</title>
+    <title>Pixels</title>
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
-    <div id="properties"><h1>Image Properties</h1></div>
-    <script src="lib/opencv.js"></script>
-    <script src="lib/opencvUtil.js"></script>
+    <p>ポインタ(ptr)を使ってピクセルにアクセス、操作をする。<a href="https://docs.opencv.org/3.3.1/de/d06/tutorial_js_basic_ops.html">参考資料</a></p>
+    <script src="/lib/opencv.js"></script>
+    <script src="/lib/opencvUtil.js"></script>
     <script>
       window.onload = function() {
         const canvas = document.getElementById("myCanvas");
@@ -19,7 +19,7 @@
         const ctx = canvas.getContext("2d");
 
         const image = new Image();
-        image.src = "img/profile.jpg";
+        image.src = "/img/lena.jpg";
         image.addEventListener("load", function() {
           ctx.drawImage(image, 0, 0);
         });
@@ -35,7 +35,6 @@
                     let pixel = src.ucharPtr(row, col);
                     pixel[0] = Math.floor(Math.random()*255);
                     pixel[1] = Math.floor(Math.random()*255);
-                    // pixel[2] = Math.floor(Math.random()*255);
                 }
             }
             
@@ -43,7 +42,6 @@
 
             //delete unnecessary Mat 
             src.delete();
-            dst.delete();
           };
         }
       };

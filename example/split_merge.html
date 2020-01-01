@@ -4,11 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Image Properties</title>
+    <title>split merge</title>
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
-    <div id="properties"><h1>Image Properties</h1></div>
     <script src="/lib/opencv.js"></script>
     <script src="/lib/opencvUtil.js"></script>
     <script>
@@ -19,7 +18,7 @@
         const ctx = canvas.getContext("2d");
 
         const image = new Image();
-        image.src = "/img/profile.jpg";
+        image.src = "/img/lena.jpg";
         image.addEventListener("load", function() {
           ctx.drawImage(image, 0, 0);
         });

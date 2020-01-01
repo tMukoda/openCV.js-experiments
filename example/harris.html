@@ -18,7 +18,7 @@
         const ctx = canvas.getContext("2d");
 
         const image = new Image();
-        image.src = "/img/lena.jpg";
+        image.src = "/img/check.png";
         image.addEventListener("load", function() {
           ctx.drawImage(image, 0, 0);
         });
@@ -29,15 +29,19 @@
           cv["onRuntimeInitialized"] = () => {
             let src = cv.imread(canvas);
             let dst = new cv.Mat();
-            let ksize = new cv.Size(30,30);
-            let anchor = new cv.Point(-1, -1);
+            let gray = new cv.Mat();
+            cv.cvtColor(src,gray,cv.COLOR_BGR2GRAY);
 
-            cv.blur(src, dst, ksize, anchor, cv.BORDER_DEFAULT);
+            cv.cornerHarris(gray,dst,2,3,0.04);
+
+            console.log(dst.max);
             cv.imshow(canvas, dst);
+
 
             //Don't forget to delete cv.Mat if you don't want to use them any more
             src.delete();
             dst.delete();
+            gray.delete();
           };
         }
       };

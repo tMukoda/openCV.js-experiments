@@ -9,8 +9,8 @@
   <body>
     <canvas id="myCanvas"></canvas>
     <div id="properties"><h1>Image Properties</h1></div>
-    <script src="lib/opencv.js"></script>
-    <script src="lib/opencvUtil.js"></script>
+    <script src="/lib/opencv.js"></script>
+    <script src="/lib/opencvUtil.js"></script>
     <script>
       window.onload = function() {
         const canvas = document.getElementById("myCanvas");
@@ -19,7 +19,7 @@
         const ctx = canvas.getContext("2d");
 
         const image = new Image();
-        image.src = "img/icon.jpg";
+        image.src = "/img/lena.jpg";
         image.addEventListener("load", function() {
           ctx.drawImage(image, 0, 0);
         });
