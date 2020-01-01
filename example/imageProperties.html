@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Image Properties</title>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+    <div id="properties"><h1>Image Properties</h1></div>
+    <script src="lib/opencv.js"></script>
+    <script src="lib/opencvUtil.js"></script>
+    <script>
+      window.onload = function() {
+        const canvas = document.getElementById("myCanvas");
+        canvas.width = 400;
+        canvas.height = 400;
+        const ctx = canvas.getContext("2d");
+
+        const image = new Image();
+        image.src = "img/icon.jpg";
+        image.addEventListener("load", function() {
+          ctx.drawImage(image, 0, 0);
+        });
+
+        openCvReady();
+
+        function openCvReady() {
+          cv["onRuntimeInitialized"] = () => {
+              const util = new opencvUtil();
+            let src = cv.imread(canvas);
+
+            let properties = document.createElement("ul");
+            properties.innerHTML = 
+            `<li>image width: ${src.cols}</li>`+
+            `<li>image height: ${src.rows}</li>`+
+            `<li>data channel: ${src.channels()}</li>`+
+            `<li>data type: ${util.showType(src)}</li>`;
+            document.getElementById("properties").appendChild(properties);
+
+            let dst = new cv.Mat();
+            // You can try more different parameters
+            cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+            console.log(typeof src);
+            cv.imshow(canvas, dst);
+
+            //Don't forget to delete cv.Mat if you don't want to use them any more
+            src.delete();
+            dst.delete();
+          };
+        }
+      };
+    </script>
+  </body>
+</html>

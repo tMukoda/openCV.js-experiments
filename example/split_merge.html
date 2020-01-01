@@ -9,8 +9,8 @@
   <body>
     <canvas id="myCanvas"></canvas>
     <div id="properties"><h1>Image Properties</h1></div>
-    <script src="lib/opencv.js"></script>
-    <script src="lib/opencvUtil.js"></script>
+    <script src="/lib/opencv.js"></script>
+    <script src="/lib/opencvUtil.js"></script>
     <script>
       window.onload = function() {
         const canvas = document.getElementById("myCanvas");
@@ -19,7 +19,7 @@
         const ctx = canvas.getContext("2d");
 
         const image = new Image();
-        image.src = "img/icon.jpg";
+        image.src = "/img/profile.jpg";
         image.addEventListener("load", function() {
           ctx.drawImage(image, 0, 0);
         });
@@ -28,26 +28,35 @@
 
         function openCvReady() {
           cv["onRuntimeInitialized"] = () => {
-              const util = new opencvUtil();
             let src = cv.imread(canvas);
-
-            let properties = document.createElement("ul");
-            properties.innerHTML = 
-            `<li>image width: ${src.cols}</li>`+
-            `<li>image height: ${src.rows}</li>`+
-            `<li>data channel: ${src.channels()}</li>`+
-            `<li>data type: ${util.showType(src)}</li>`;
-            document.getElementById("properties").appendChild(properties);
-
             let dst = new cv.Mat();
-            // You can try more different parameters
-            cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
-            console.log(util.showType(dst));
-            cv.imshow(canvas, dst);
 
-            //Don't forget to delete cv.Mat if you don't want to use them any more
+            //split src Matrix into R, G, and B Matrices
+            let rgbaPlanes = new cv.MatVector();
+            cv.split(src, rgbaPlanes);
+            let R = rgbaPlanes.get(0);
+            let G = rgbaPlanes.get(1);
+            let B = rgbaPlanes.get(2);
+
+            //create Vector for shuffled R, G, and B Matrices
+            let color_shuffle = new cv.MatVector();
+            color_shuffle.push_back(G);
+            color_shuffle.push_back(B);
+            color_shuffle.push_back(R);
+
+            //merge Vector elements into one Mat and save it in dst
+            cv.merge(color_shuffle, dst);
+            cv.imshow(canvas, dst);
+            // console.log(rgbaPlanes.size());
+
+            //delete unnecessary Mat 
             src.delete();
             dst.delete();
+            rgbaPlanes.delete();
+            R.delete();
+            G.delete();
+            B.delete();
+            color_shuffle.delete();
           };
         }
       };

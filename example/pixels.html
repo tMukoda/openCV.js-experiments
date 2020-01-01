@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Image Properties</title>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+    <div id="properties"><h1>Image Properties</h1></div>
+    <script src="lib/opencv.js"></script>
+    <script src="lib/opencvUtil.js"></script>
+    <script>
+      window.onload = function() {
+        const canvas = document.getElementById("myCanvas");
+        canvas.width = 400;
+        canvas.height = 400;
+        const ctx = canvas.getContext("2d");
+
+        const image = new Image();
+        image.src = "img/profile.jpg";
+        image.addEventListener("load", function() {
+          ctx.drawImage(image, 0, 0);
+        });
+
+        openCvReady();
+
+        function openCvReady() {
+          cv["onRuntimeInitialized"] = () => {
+            let src = cv.imread(canvas);
+
+            for(let row = 0; row<src.rows; row++){
+                for(let col = 0; col<src.cols; col++){
+                    let pixel = src.ucharPtr(row, col);
+                    pixel[0] = Math.floor(Math.random()*255);
+                    pixel[1] = Math.floor(Math.random()*255);
+                    // pixel[2] = Math.floor(Math.random()*255);
+                }
+            }
+            
+            cv.imshow(canvas, src);
+
+            //delete unnecessary Mat 
+            src.delete();
+            dst.delete();
+          };
+        }
+      };
+    </script>
+  </body>
+</html>
